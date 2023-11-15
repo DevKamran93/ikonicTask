@@ -5,6 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- loader-->
     {{-- <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet" /> --}}
@@ -41,7 +42,9 @@
         }
         $desired_path = substr($segments, strpos($segments, '/', 1) + 1);
         $current_page = ucwords(str_replace('/', ' ', $desired_path));
-
+        if (intval($segment) > 0) {
+            $page = 'Feedback Detail';
+        }
     @endphp
     <title>{{ Auth::check() && Auth::user()->type == 'admin' ? 'Admin' : 'Moderator' }} | {{ $page ?? '' }}</title>
     @notifyCss
@@ -99,11 +102,11 @@
                     </a>
                 </li>
                 <li>
-                    <a href="pages-to-do.html">
+                    <a href="{{ route('users') }}">
                         <div class="parent-icon">
                             <i class="bi bi-check2-square"></i>
                         </div>
-                        <div class="menu-title">Feedbacks</div>
+                        <div class="menu-title">Users</div>
                     </a>
                 </li>
             </ul>
@@ -193,6 +196,7 @@
     <!--end wrapper-->
 
     @notifyJs
+
     <!-- JS Files-->
     {{-- <script src="assets/js/jquery.min.js"></script> --}}
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
@@ -200,14 +204,10 @@
     <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    {{-- <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script> --}}
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
-    {{-- <script src="{{ asset('assets/plugins/apexcharts-bundle/js/apexcharts.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script> --}}
     <script src="{{ asset('assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>
-    {{-- <script src="{{ asset('assets/js/index.js') }}"></script> --}}
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="{{ asset('assets/js/common.js') }}"></script>
@@ -219,7 +219,6 @@
         });
 
         function SendAjaxRequestToServer(requestType = 'GET', url, data, dataType = 'json', callBack = '') {
-            // console.log(data, url, dataType);
             $.ajax({
                 type: requestType,
                 url: url,

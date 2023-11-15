@@ -20,7 +20,7 @@
                         <div class="col-md-4">
                             <h5>Date</h5>
                         </div>
-                        <div class="col-md-8">{{ $feedback->created_at }}</div>
+                        <div class="col-md-8">{{ date('m/d/Y, H:i A', strtotime($feedback->created_at)) }}</div>
 
                         <div class="col-md-4">
                             <h5>Vote:</h5>
@@ -46,34 +46,33 @@
                                 <span id="down_count">{{ $feedback->downVotes->count() }}</span>
                             </button>
                         </div>
-                        {{-- @dd($feedback) --}}
                         <hr class="my-2">
                         <div class="col-md-12">
-                            @php
-                                $comments = $feedback->feedbackComments;
-                            @endphp
-                            {{-- @dd($comments) --}}
-                            @if (empty($comments))
-                                <h5>Be first to Comment!</h5>
-                            @else
-                                @forelse ($comments as $comment)
-                                    <div class="mb-2">
+                            <div class="mb-2" id="show_comment">
+                                @forelse ($feedback->feedbackComments as $comment)
+                                    <div class="comment mb-2">
                                         <h4>{{ $comment->user->name }}</h4>
-                                        <h5>{{ $comment->created_at }}</h5>
-                                        <p>{{ $comment->comment }}</p>
+                                        <h5>{{ date('m/d/Y, H:i A', strtotime($comment->created_at)) }}</h5>
+                                        <p>{!! $comment->comment !!}</p>
                                     </div>
                                 @empty
-                                    <h5>No Comments</h5>
+                                    <h5 id="no_comment">Be first to Comment!</h5>
                                 @endforelse
-                                <div id="show_comment">
+                            </div>
+                            <div id="loadMore">
+                                <button type="button" id="load_more_btn" class="btn btn-outline-danger btn-sm"
+                                    data-feedback_id='{{ $feedback->id }}'
+                                    data-comment_id='{{ !empty($comment) ? $comment->id : '' }}'>
+                                    Load More
+                                </button>
+                            </div>
 
-                                </div>
+                            @if ($feedback->comments != 0)
+                                <textarea name="comment" id="comment" cols="30" rows="5" class="form-control my-4"></textarea>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    onclick="submitComment({{ $feedback->id }})"> Submit
+                                </button>
                             @endif
-
-                            <textarea name="comment" id="comment" cols="30" rows="5" class="form-control my-2"></textarea>
-                            <button type="button" class="btn btn-outline-danger btn-sm"
-                                onclick="submitComment({{ $feedback->id }})"> Submit
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -83,6 +82,14 @@
 @endsection
 @push('javascript')
     <script>
+        $(document).ready(function() {
+            $('#comment').summernote({
+                placeholder: 'Please Write Here',
+                tabsize: 2,
+                height: 100
+            });
+        });
+
         function feedbackVoting(id, action) {
 
             var data = JSON.stringify({
@@ -108,7 +115,6 @@
 
         function submitComment(id) {
             var comment = document.getElementById('comment').value;
-            console.log(id, comment.length);
             if (comment == '') {
                 toastr.error('Please Write Comment');
                 return false;
@@ -133,18 +139,62 @@
             if (response.status == 200) {
                 $('#comment').val('');
                 const newComment = response.data;
+                var formattedDate = new Date(response.data.created_at).toLocaleString();
 
                 const newCommentElement = `
-            <div class=" mb-2">
-                <h4>${newComment.user.name}</h4>
-                <h5>Date: ${newComment.created_at}</h5>
-                <p>${newComment.comment}</p>
-            </div>`;
+                    <div class="comment mb-2">
+                        <h4>${newComment.user.name}</h4>
+                        <h5>${formattedDate}</h5>
+                        <p>${newComment.comment}</p>
+                    </div>`;
 
                 $('#show_comment').append(newCommentElement);
+                $('#no_comment').empty();
+                $('.note-editable').text('');
 
                 toastr[response.state](response.message, response.state);
             }
         }
+
+        function loadMore(feedback_id, last_comment_id) {
+            var data = JSON.stringify({
+                id: last_comment_id,
+                feedback_id: feedback_id,
+            });
+
+            var url = "{{ route('user.feedback.loadMore') }}";
+
+            SendAjaxRequestToServer('POST', url, data, 'json', updateLoadMore);
+        }
+
+
+        function updateLoadMore(response) {
+            if (response.status == 200) {
+                var new_comments = '';
+                let last_comment_id = '';
+                $.each(response.data, function(index, value) {
+                    // Format the date
+                    var formattedDate = new Date(value.created_at).toLocaleString();
+
+                    new_comments += `<div class="comment mb-2">
+                                <h4>${value.user.name}</h4>
+                                <h5>${formattedDate}</h5>
+                                <p>${value.comment}</p>
+                            </div>`;
+                    last_comment_id = value.id;
+                });
+                $('#show_comment').append(new_comments);
+                $('#load_more_btn').data('comment_id', last_comment_id);
+            }
+        }
+
+        $(document).on('click', '#load_more_btn', function(e) {
+            let feedback_id = $(this).data('feedback_id');
+            let last_comment_id = $(this).data('comment_id');
+            if (last_comment_id != '') {
+                loadMore(feedback_id, last_comment_id)
+
+            }
+        })
     </script>
 @endpush

@@ -42,7 +42,7 @@ class HomeController extends Controller
             'user',
             'feedbackCategory',
             'feedbackComments' => function ($query) {
-                $query->take(10);
+                $query->take(5);
             },
             'upVotes',
             'downVotes'
@@ -65,7 +65,8 @@ class HomeController extends Controller
             'title' => $request->title,
             'feedback_category_id' => $request->category,
             'description' => $request->description,
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
+            'comments' => 1
         ]);
 
         if ($feedback) {
@@ -136,6 +137,24 @@ class HomeController extends Controller
             return JsonResponse(422, "error", "Something Went Wrong !", '');
         }
     }
+
+    public function feedbackLoadMore()
+    {
+        $request = json_decode(file_get_contents('php://input'), true);
+
+        $more_comments = Comment::where('feedback_id', $request['feedback_id'])
+            ->where('id', '>', $request['id'])
+            ->with('user')
+            ->take(5)
+            ->get();
+
+        if ($more_comments->count() > 0) {
+            return response()->json(['status' => 200, 'data' => $more_comments]);
+        } else {
+            return JsonResponse(422, "error", "No more comments found.", '');
+        }
+    }
+
 
 
     public function welcome()

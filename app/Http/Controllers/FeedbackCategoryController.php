@@ -78,9 +78,9 @@ class FeedbackCategoryController extends Controller
         ]);
 
         if ($category) {
-            return JsonResponse(200, 'success', 'Category Successfully Added !');
+            return JsonResponse(200, 'success', 'Category Successfully Added !', '');
         } else {
-            return JsonResponse(422, 'warning', 'Something Went Wrong !');
+            return JsonResponse(422, 'warning', 'Something Went Wrong !', '');
         }
     }
 
@@ -109,9 +109,9 @@ class FeedbackCategoryController extends Controller
         $category_data = $request->except(['_token', '_method']);
 
         if ($category->update($category_data)) {
-            return JsonResponse(200, 'success', 'Category Successfully Updated !');
+            return JsonResponse(200, 'success', 'Category Successfully Updated !', '');
         } else {
-            return JsonResponse(422, 'warning', 'Category Not Updated !');
+            return JsonResponse(422, 'warning', 'Category Not Updated !', '');
         }
     }
 
@@ -130,9 +130,9 @@ class FeedbackCategoryController extends Controller
         }
 
         if ($success) {
-            return JsonResponse(200, 'success', "Category Successfully $message !");
+            return JsonResponse(200, 'success', "Category Successfully $message !", '');
         } else {
-            return JsonResponse(422, 'warning', 'Operation Failed, Try Again !');
+            return JsonResponse(422, 'warning', 'Operation Failed, Try Again !', '');
         }
     }
 }

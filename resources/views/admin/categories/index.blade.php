@@ -101,7 +101,6 @@
                 SendAjaxRequestToServer(type, url, data, '', createUpdateCategoryResponse);
 
                 function createUpdateCategoryResponse(response) {
-                    console.log(response);
                     if (response.status != 200) {
                         add_edit_form.find('span').removeClass('d-block').html('');
                         $('#create_update_btn').removeAttr("disabled");

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->longText('description')->nullable();
             $table->integer('vote')->nullable();
-            $table->enum('comments', ['0', '1'])->default('1');
+            $table->integer('comments')->default('1');
             $table->timestamps();
             $table->softDeletes()->nullable();
         });

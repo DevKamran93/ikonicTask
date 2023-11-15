@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Feedback extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+
     protected $fillable = ['title', 'feedback_category_id', 'description', 'user_id', 'vote', 'voted_users', 'comments'];
     /**
      * Get all of the comments for the Feedback
@@ -54,5 +57,10 @@ class Feedback extends Model
     public function downVotes(): HasMany
     {
         return $this->hasMany(Vote::class, 'feedback_id', 'id')->where('vote_action', 'down');
+    }
+
+    public function totalVotes(): HasMany
+    {
+        return $this->hasMany(Vote::class, 'feedback_id', 'id');
     }
 }

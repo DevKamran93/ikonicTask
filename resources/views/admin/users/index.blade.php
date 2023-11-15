@@ -8,12 +8,9 @@
                     <thead>
                         <tr>
                             <th>Sr #</th>
-                            <th>Title</th>
-                            <th>Category</th>
-                            <th>Comments</th>
-                            <th>Added by</th>
-                            <th>Vote</th>
-                            <th>Comments (On/Off)</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Type</th>
                             <th>Created</th>
                             <th>Action</th>
                         </tr>
@@ -39,9 +36,9 @@
             var feedback_table = $("#feedback_table");
             var delete_restore_modal = $('#delete_restore_modal');
 
-            fetchAllFeedbacks();
+            fetchAllUsers();
 
-            function fetchAllFeedbacks() {
+            function fetchAllUsers() {
                 feedback_table.DataTable({
                     "pagingType": 'numbers',
                     "orderable": true,
@@ -55,7 +52,7 @@
                     "autoWidth": true,
                     "processing": true,
                     "serverSide": true,
-                    "ajax": "{{ route('feedback.getAllFeedbacksData') }}",
+                    "ajax": "{{ route('getAllUsers') }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -63,39 +60,21 @@
                             searchable: false
                         },
                         {
-                            data: 'title',
-                            name: 'title',
-                            orderable: true,
-                            searchable: true
+                            data: 'name',
+                            name: 'name',
+                            orderable: false,
+                            searchable: false
                         },
 
                         {
-                            data: 'category',
-                            name: 'category',
+                            data: 'email',
+                            name: 'email',
                             orderable: false,
                             searchable: false
                         },
                         {
-                            data: 'feedback_comments',
-                            name: 'feedback_comments',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'user',
-                            name: 'user',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'votes',
-                            name: 'votes',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'comments',
-                            name: 'comments',
+                            data: 'type',
+                            name: 'type',
                             orderable: false,
                             searchable: false
                         },
@@ -121,7 +100,7 @@
                 confirm_btn.find('#delete_btn_spinner').removeClass('d-none');
                 confirm_btn.addClass('disabled');
                 let dalate_restore_form = $('#delete_restore_form');
-                var url = "{{ route('feedback.destroyOrRestore') }}";
+                var url = "{{ route('deleteUser') }}";
                 var data = new FormData(dalate_restore_form[0]);
 
                 SendAjaxRequestToServer('POST', url, data, 'json', deleteRestoreResponse);

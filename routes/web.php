@@ -7,6 +7,7 @@ use App\Http\Middleware\UserTypeRedirect;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\FeedbackCategoryController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Hash;
 
 /*
@@ -20,7 +21,6 @@ use Illuminate\Support\Facades\Hash;
 |
 */
 
-// dd(Hash::make('kami1234'));
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -39,7 +39,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function 
     // Feedback Routes
     Route::get('/feedbacks', [FeedbackController::class, 'index'])->name('feedbacks');
     Route::get('/feedback/getAllFeedbacks', [FeedbackController::class, 'getAllFeedbacksData'])->name('feedback.getAllFeedbacksData');
+    Route::get('/feedbacks/{id}', [FeedbackController::class, 'show'])->name('feedback.details');
     Route::post('/feedback/destroyOrRestore', [FeedbackController::class, 'destroyOrRestore'])->name('feedback.destroyOrRestore');
+    Route::post('/feedback/loadMoreComments', [FeedbackController::class, 'feedbackLoadMoreComments'])->name('feedback.loadMore');
+    Route::post('/feedback/changeCommentsStatus', [FeedbackController::class, 'feedbackchangeCommentsStatus'])->name('feedback.changeComments');
+
+    Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/getAllUsers', [UserController::class, 'getAllUsersData'])->name('getAllUsers');
+    Route::post('/deleteUser', [UserController::class, 'destroyOrRestore'])->name('deleteUser');
 });
 
 Route::group(['middleware' => ['auth', 'user.type']], function () {
@@ -50,6 +57,7 @@ Route::group(['middleware' => ['auth', 'user.type']], function () {
     Route::get('/feedbacks', [HomeController::class, 'index'])->name('user.feedbacks');
     Route::post('/feedback/voting', [HomeController::class, 'feedbackVoting'])->name('user.feedback.voting');
     Route::post('/feedback/comment', [HomeController::class, 'feedbackComment'])->name('user.feedback.comment');
+    Route::post('/feedback/loadMore', [HomeController::class, 'feedbackLoadMore'])->name('user.feedback.loadMore');
 });
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');

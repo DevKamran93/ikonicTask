@@ -45,6 +45,7 @@
       <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
       <!-- Scripts -->
+      <link rel="stylesheet" href="{{ asset('assets2/summernote/summernote-bs4.min.css') }}" />
       @vite(['resources/sass/app.scss', 'resources/js/app.js'])
       @notifyCss
       @php
@@ -91,6 +92,10 @@
 
           .submit_btn:hover {
               background-color: #1d3557;
+          }
+
+          .note-editor {
+              margin: 15px 0px;
           }
       </style>
   </head>
@@ -277,6 +282,7 @@
       <!-- Custom Main JS -->
       <script src="{{ asset('assets2/js/main.js') }}"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+      <script src="{{ asset('assets2/summernote/summernote-bs4.min.js') }}"></script>
       <script>
           //   $(document).ready(function() {
           toastr.options = {
@@ -294,7 +300,6 @@
           });
 
           function SendAjaxRequestToServer(requestType = 'GET', url, data, dataType = 'json', callBack = '') {
-              // console.log(data, url, dataType);
               $.ajax({
                   type: requestType,
                   url: url,
